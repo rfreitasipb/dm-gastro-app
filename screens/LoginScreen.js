@@ -16,7 +16,7 @@ export default function LoginScreen({ navigation }) {
     try {
       const userCredentials = await signIn(email, password);
       console.log(userCredentials);
-      await AsyncStorage.setItem("isLoggedIn", "true");
+      await AsyncStorage.setItem('isLoggedIn', JSON.stringify(true));
       console.log("User logged in successfully.");
       navigation.navigate("Home");
     } catch (error) {
@@ -25,7 +25,6 @@ export default function LoginScreen({ navigation }) {
     }
     setLoading(false);
   };
-  
 
   const handleRegisterNavigation = () => {
     navigation.navigate("Register"); 
