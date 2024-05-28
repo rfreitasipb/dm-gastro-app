@@ -4,25 +4,27 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { globalStyles } from "../styles/global";
 import { useTheme } from "../context/ThemeContext";
 import { signOut } from "../authConfig";
+import { useIsFocused } from '@react-navigation/native';
 
 export default function HomeScreen({ navigation }) {
   const { theme } = useTheme();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-
-
+  const isFocused = useIsFocused();
 
   useEffect(() => {
-   fetchLoginStatus();
-  }, []);
+    const fetchLoginStatus = async () => {
+      try {
+        const isLoggedIn = await AsyncStorage.getItem("isLoggedIn");
+        setIsLoggedIn(JSON.parse(isLoggedIn));
+      } catch (error) {
+        console.error("Error fetching login status:", error);
+      }
+    };
 
-  const fetchLoginStatus = async () => {
-    try {
-      const isLoggedIn = await AsyncStorage.getItem("isLoggedIn");
-      setIsLoggedIn(isLoggedIn === "true");
-    } catch (error) {
-      console.error("Error fetching login status:", error);
+    if (isFocused) {
+      fetchLoginStatus();
     }
-  };
+  }, [isFocused]);
 
   const handleLogout = async () => {
     try {
@@ -33,7 +35,6 @@ export default function HomeScreen({ navigation }) {
       console.error("Error logging out:", error);
     }
   };
-
 
   return (
     <View style={[globalStyles.container, { backgroundColor: theme.background }]}>
@@ -47,16 +48,16 @@ export default function HomeScreen({ navigation }) {
         Bem vindo à aplicação de guia de restaurantes
       </Text>
      
-          <TouchableOpacity
-            style={[
-              globalStyles.buttonStyle,
-              { backgroundColor: theme.buttonBackground, width: 250, marginTop: 50 },
-            ]}
-            onPress={() => navigation.navigate("Mapa")}
-          >
-            <Text style={[globalStyles.text, { color: theme.text }]}>Entrar</Text>
-          </TouchableOpacity>
-          {isLoggedIn ? (
+      <TouchableOpacity
+        style={[
+          globalStyles.buttonStyle,
+          { backgroundColor: theme.buttonBackground, width: 250, marginTop: 50 },
+        ]}
+        onPress={() => navigation.navigate("Mapa")}
+      >
+        <Text style={[globalStyles.text, { color: theme.text }]}>Entrar</Text>
+      </TouchableOpacity>
+      {isLoggedIn ? (
         <>
           <TouchableOpacity
             style={[
@@ -100,4 +101,3 @@ export default function HomeScreen({ navigation }) {
     </View>
   );
 }
-
